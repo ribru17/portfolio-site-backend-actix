@@ -40,11 +40,14 @@ async fn contact() -> impl Responder {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
+    // port is PORT || 8080
+    let port_string = std::env::var("PORT").unwrap_or("8080".to_string());
+    let port = port_string.parse().unwrap();
     HttpServer::new(|| {
         App::new()
             .service(contact)
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(("127.0.0.1", port))?
     .run()
     .await
 }
