@@ -9,3 +9,4 @@ edition = "2021"
 actix-web = "4.2.1"
 dotenv = "0.15.0"
 lettre = "0.10.1"
+serde = { version = "1.0.152", features = ["derive"] }

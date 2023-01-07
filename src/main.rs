@@ -1,15 +1,17 @@
 use actix_web::http::StatusCode;
-use actix_web::{post, App, HttpResponse, HttpServer, Responder};
+use actix_web::{post, App, HttpResponse, HttpServer, Responder, web};
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
+use serde::Deserialize;
+
 use dotenv::dotenv;
 
-fn send_mail() -> impl Responder {
+fn send_mail(name: &String, message: &String) -> impl Responder {
     let email = Message::builder()
         .from("ribru17@gmail.com".parse().unwrap())
         .to("ribru17@gmail.com".parse().unwrap())
-        .subject("Web message from {name}")
-        .body(String::from("<Message here>"))
+        .subject(format!("Web message from {}", name))
+        .body(format!("{}", message))
         .unwrap();
 
     let creds = Credentials::new(
@@ -32,9 +34,15 @@ fn send_mail() -> impl Responder {
     }
 }
 
+#[derive(Deserialize)]
+struct MessageParams {
+    name: String,
+    message: String
+}
+
 #[post("/api/contact")]
-async fn contact() -> impl Responder {
-    send_mail()
+async fn contact(req: web::Json<MessageParams>) -> impl Responder {
+    send_mail(&req.name.clone(), &req.message)
 }
 
 #[actix_web::main]
