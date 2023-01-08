@@ -49,13 +49,17 @@ async fn contact(req: web::Json<MessageParams>) -> impl Responder {
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
     // port is PORT || 8080
-    let port_string = std::env::var("PORT").unwrap_or("8080".to_string());
-    let port = port_string.parse().unwrap();
+    let port = std::env::var("PORT")
+        .unwrap_or("8080".to_string()).parse().unwrap();
+    let location = match std::env::var("IS_DEV") {
+        Ok(_) => "127.0.0.1",
+        Err(_) => "0.0.0.0"
+    };
     HttpServer::new(|| {
         App::new()
             .service(contact)
     })
-    .bind(("127.0.0.1", port))?
+    .bind((location, port))?
     .run()
     .await
 }
