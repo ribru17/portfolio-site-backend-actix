@@ -3,6 +3,7 @@ use actix_web::{post, App, HttpResponse, HttpServer, Responder, web};
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
 use serde::Deserialize;
+use actix_cors::Cors;
 
 use dotenv::dotenv;
 
@@ -56,7 +57,10 @@ async fn main() -> std::io::Result<()> {
         Err(_) => "0.0.0.0"
     };
     HttpServer::new(|| {
+        // allows all requests; temporary, not recommended solution
+        let cors = Cors::permissive();
         App::new()
+            .wrap(cors)
             .service(contact)
     })
     .bind((location, port))?
